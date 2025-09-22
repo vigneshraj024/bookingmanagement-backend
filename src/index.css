@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Sports Booking Management - Design System */
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Sports-themed primary - Deep green for sports/field */
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 76% 32%;
+
+    /* Secondary - Light blue for trust/management */
+    --secondary: 200 95% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 200 95% 40%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142 76% 36%;
+
+    /* Sport-specific colors */
+    --cricket: 120 61% 34%;
+    --football: 220 90% 56%;
+    --pickleball: 35 91% 65%;
+    --gaming: 280 89% 58%;
+
+    /* Status colors */
+    --success: 142 71% 45%;
+    --warning: 43 96% 56%;
+    --info: 200 95% 45%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(210 40% 98%));
+    --gradient-sport: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--secondary) / 0.1));
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 76% 40%;
+
+    --secondary: 200 95% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 200 95% 50%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142 76% 36%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 142 76% 36%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* Sport-specific styling */
+  .sport-cricket { @apply bg-green-600 text-white; }
+  .sport-football { @apply bg-blue-600 text-white; }
+  .sport-pickleball { @apply bg-orange-500 text-white; }
+  .sport-gaming { @apply bg-purple-600 text-white; }
+
+  /* Booking status styling */
+  .booking-card {
+    @apply bg-card rounded-lg border border-border/50 p-4 shadow-sm hover:shadow-md transition-all duration-200;
+    background: var(--gradient-card);
+  }
+
+  .booking-slot {
+    @apply rounded-md border-2 border-dashed border-border/30 p-3 text-center text-sm text-muted-foreground hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 cursor-pointer;
+  }
+
+  .booking-slot.occupied {
+    @apply border-solid bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20 text-foreground font-medium;
+  }
+
+  /* Dashboard cards */
+  .stats-card {
+    @apply bg-card rounded-xl border border-border/50 p-6 shadow-sm;
+    background: var(--gradient-card);
+  }
+
+  /* Interactive elements */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .fade-in {
+    @apply animate-in slide-in-from-bottom-2 duration-300;
+  }
+}
