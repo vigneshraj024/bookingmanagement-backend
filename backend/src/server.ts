@@ -20,18 +20,21 @@
 // app.use('/api/bookings', auth, bookingRouter);
 // app.use('/api/auth', authRouter);
 // app.get('/health', (_req, res) => res.json({ ok: true }));
-
 // const PORT = Number(process.env.PORT ?? 3000);
 // app.listen(PORT, () => {
 //   console.log(`API running on http://localhost:${PORT}`);
 // });
 
-// export default app;
+// ✅ Production-ready server configuration
 import 'dotenv/config';
 import app from './app.js';
 
-// ✅ Start server (for local development only)
-const PORT = Number(process.env.PORT ?? 3000);
+// ✅ Use dynamic port for deployment platforms (Render, Heroku, etc.)
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`🚀 API running on http://localhost:${PORT}`);
+  console.log(`🌐 Server ready to accept connections`);
 });
+
+export default app;
