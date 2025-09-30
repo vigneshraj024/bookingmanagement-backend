@@ -4,6 +4,6 @@ import { listAuditLogs } from '../Controller/auditcontroller.js';
 
 const router = express.Router();
 
-router.get('/', auth, listAuditLogs);
+router.get('/',  listAuditLogs);
 
 export default router;

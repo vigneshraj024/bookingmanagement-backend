@@ -35,7 +35,7 @@ export function AuditLogsPage() {
     if (from) params.set('from', from);
     if (to) params.set('to', to);
     const qs = params.toString();
-    return `/api/audits${qs ? `?${qs}` : ''}`;
+    return `/api/booking/audits${qs ? `?${qs}` : ''}`;
   }, [action, entity, actorEmail, from, to]);
 
   const load = async () => {

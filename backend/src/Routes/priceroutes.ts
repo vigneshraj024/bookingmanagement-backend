@@ -4,11 +4,11 @@ import { listPrices, getPriceById, getPriceBySport, createPrice, updatePrice, de
 
 const router = express.Router();
 
-router.get('/', auth, listPrices);
-router.get('/sport/:sport', auth, getPriceBySport);
-router.get('/:id', auth, getPriceById);
-router.post('/', auth, createPrice);
-router.put('/:id', auth, updatePrice);
-router.delete('/:id', auth, deletePrice);
+router.get('/', listPrices);
+router.get('/sport/:sport', getPriceBySport);
+router.get('/:id', getPriceById);
+router.post('/', createPrice);
+router.put('/:id', updatePrice);
+router.delete('/:id', deletePrice);
 
 export default router;

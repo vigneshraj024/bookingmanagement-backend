@@ -38,30 +38,20 @@ export function Header({ admin, onSignOut }: HeaderProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="flex items-center">
-            <img 
-              src="/turf-logo.png" 
-              alt="TURF 50 Logo" 
-              className="h-12 w-auto"
-              onError={(e) => {
-                console.error('Failed to load logo');
-                // Fallback to text if image fails to load
-                e.currentTarget.outerHTML = `
-                  <div class="flex items-center">
-                    <div class="h-10 w-10 bg-gradient-to-br from-green-600 to-green-800 text-white rounded-md flex items-center justify-center font-bold text-xl mr-3">
-                      T50
-                    </div>
-                    <span class="text-xl font-bold">TURF 50</span>
-                  </div>
-                `;
-              }}
-            />
+            {/* Use fallback logo since the image file is corrupted */}
+            <div className="h-12 w-auto flex items-center">
+              <div className="h-10 w-10 bg-gradient-to-br from-green-600 to-green-800 text-white rounded-md flex items-center justify-center font-bold text-xl mr-3">
+                T50
+              </div>
+              <span className="text-xl font-bold">TURF 50</span>
+            </div>
           </div>
         </div>
 
         <div className="flex items-center space-x-4">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-medium">Welcome back,</p>
-<p className="text-sm text-muted-foreground">{admin.name}</p>
+            <p className="text-sm text-muted-foreground">{admin.name}</p>
           </div>
 
           <DropdownMenu>
