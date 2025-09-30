@@ -13,36 +13,73 @@ export const app = express();
 
 // Security & Middleware
 app.use(helmet());
-// CORS: allow only configured frontends (plus local dev)
-const allowedOrigins = [
-  process.env.FRONTEND_ORIGIN,
-  process.env.FRONTEND_ORIGIN_2,
-  'http://localhost:5173', // Vite default
-  'http://localhost:3000', // CRA default
-].filter(Boolean) as string[];
+// CORS: Configure allowed origins based on environment
+const isProduction = process.env.NODE_ENV === 'production';
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow non-browser requests (no origin) and whitelisted origins
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-// Handle preflight requests
-app.options('*', cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
+const allowedOrigins = isProduction
+  ? [
+      'https://sports-booking-turf50.web.app', // Production frontend
+      'https://sports-booking-turf50.firebaseapp.com', // Firebase auth domain
+      'https://turf50-5a2f5.web.app', // Fallback Firebase domain
+      'https://turf50-5a2f5.firebaseapp.com', // Fallback Firebase auth
+    ]
+  : [
+      'http://localhost:5173', // Vite dev server
+      'http://localhost:3000', // Common dev port
+      'http://127.0.0.1:5173', // Alternative localhost
+      'http://127.0.0.1:3000', // Alternative localhost
+      'http://localhost:4173', // Vite preview
+      process.env.FRONTEND_ORIGIN,
+    ];
+
+// Add any additional origins from environment variables
+const additionalOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+const finalAllowedOrigins = [...new Set([...allowedOrigins, ...additionalOrigins])].filter(Boolean) as string[];
+
+// Log allowed origins for debugging
+console.log('Allowed CORS origins:', allowedOrigins);
+
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // In development, allow all origins for easier testing
+    if (!isProduction) {
+      console.log(`Allowing request from: ${origin}`);
+      return callback(null, true);
+    }
+    
+    // In production, only allow whitelisted origins
+    if (finalAllowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    console.warn('Blocked by CORS:', origin);
+    console.warn('Allowed origins:', finalAllowedOrigins);
+    return callback(new Error(`Not allowed by CORS. Origin: ${origin}`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Total-Count'],
+  maxAge: 86400, // 24 hours
+};
+
+// Apply CORS with the defined options
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // Routes
