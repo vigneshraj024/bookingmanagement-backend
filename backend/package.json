@@ -2,13 +2,16 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend API for Sports Booking Management Platform",
-  "main": "dist/server.ts",
+  "main": "dist/server.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "test": "jest",
-    "type": "module"
+    "test": "jest"
   },
   "keywords": [
     "sports",

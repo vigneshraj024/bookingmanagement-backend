@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { loginAdmin } from '@/api/authservies';
+import { authService } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trophy, Calendar, Users, BarChart3 } from 'lucide-react';
 interface LoginFormProps {
@@ -15,13 +15,18 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  // Logo candidates from public/ with graceful fallback
+  const logoCandidates = ['/logo.png', '/turf5.png', '/logo.svg'];
+  const [logoIdx, setLogoIdx] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await loginAdmin(email, password);
+      const { data, error } = await authService.signIn(email, password);
+      if (error) throw error;
+      if (!data?.token) throw new Error('Login failed');
 
       toast({
         title: "Welcome back!",
@@ -33,7 +38,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: error.message || "An unexpected error occurred.",
+        description: error?.message || "Invalid credentials or server error.",
         variant: "destructive",
       });
     } finally {
@@ -47,12 +52,21 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         {/* Left side - Branding */}
         <div className="text-center lg:text-left space-y-8">
           <div className="space-y-4">
-            <div className="flex items-center justify-center lg:justify-start space-x-3">
-              <div className="bg-primary rounded-xl p-3">
-                <Trophy className="h-8 w-8 text-primary-foreground" />
-              </div>
+            <div className="flex items-center justify-center lg:justify-start gap-3">
+              {logoIdx < logoCandidates.length ? (
+                <img
+                  src={logoCandidates[logoIdx]}
+                  alt="TURF 50"
+                  className="h-12 w-12 rounded-md object-contain bg-transparent"
+                  onError={() => setLogoIdx((i) => i + 1)}
+                />
+              ) : (
+                <div className="bg-primary rounded-xl p-3">
+                  <Trophy className="h-8 w-8 text-primary-foreground" />
+                </div>
+              )}
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Sports Booking
+                TURF 50 Booking
               </h1>
             </div>
             <p className="text-xl text-muted-foreground max-w-md">
@@ -135,13 +149,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 </Button>
               </form>
 
-              <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Demo credentials:</strong><br />
-                  Email: admin@sportsbooking.com<br />
-                  Password: admin123
-                </p>
-              </div>
+              {/* Demo credentials removed as requested */}
             </CardContent>
           </Card>
         </div>

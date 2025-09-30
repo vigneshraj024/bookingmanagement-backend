@@ -3,11 +3,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // 👈 added Navigate
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Dashboard } from "@/pages/Dashboard";
 import { Admin } from "@/types/booking";
 import NotFound from "./pages/NotFound";
+import { authService } from "@/lib/auth";
+import { AuditLogsPage } from "@/pages/AuditLogs";
+import { PriceMasterPage } from "@/pages/PriceMaster";
 
 const queryClient = new QueryClient();
 
@@ -17,19 +20,29 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuthStatus();
+    let unsub: any;
+    const init = async () => {
+      await checkAuthStatus();
+      const sub = authService.onAuthStateChange(async () => {
+        await checkAuthStatus();
+      });
+      unsub = sub.unsubscribe;
+    };
+    init();
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, []);
 
   const checkAuthStatus = async () => {
     try {
-      // For custom API authentication, check if user is logged in
-      // You could check localStorage, sessionStorage, or make an API call
-      const isLoggedIn = localStorage.getItem('isAuthenticated') === 'true';
-      const storedAdmin = localStorage.getItem('currentAdmin');
-      
-      if (isLoggedIn && storedAdmin) {
-        setCurrentAdmin(JSON.parse(storedAdmin));
+      const user = await authService.getCurrentUser();
+      if (user) {
+        setCurrentAdmin(user);
         setIsAuthenticated(true);
+      } else {
+        setCurrentAdmin(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -39,27 +52,11 @@ const App = () => {
   };
 
   const handleLoginSuccess = async () => {
-    // For custom API authentication, we'll create a mock admin object
-    // In a real app, you'd get this from your API response or localStorage
-    const mockAdmin: Admin = {
-      id: "1",
-      name: "Admin User",
-      email: "admin@sportsbooking.com"
-    };
-    
-    // Store authentication state in localStorage
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('currentAdmin', JSON.stringify(mockAdmin));
-    
-    setCurrentAdmin(mockAdmin);
-    setIsAuthenticated(true);
+    await checkAuthStatus();
   };
 
   const handleSignOut = () => {
-    // Clear authentication state from localStorage
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('currentAdmin');
-    
+    authService.signOut();
     setCurrentAdmin(null);
     setIsAuthenticated(false);
   };
@@ -103,6 +100,30 @@ const App = () => {
           <Dashboard admin={currentAdmin} onSignOut={handleSignOut} />
         ) : (
           <Navigate to="/" replace /> // redirect if not logged in
+        )
+      }
+    />
+
+    {/* Audit Logs route */}
+    <Route
+      path="/audit-logs"
+      element={
+        isAuthenticated && currentAdmin ? (
+          <AuditLogsPage />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      }
+    />
+
+    {/* Price Master route */}
+    <Route
+      path="/price-master"
+      element={
+        isAuthenticated && currentAdmin ? (
+          <PriceMasterPage />
+        ) : (
+          <Navigate to="/" replace />
         )
       }
     />

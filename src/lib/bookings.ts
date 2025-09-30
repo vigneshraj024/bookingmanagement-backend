@@ -1,8 +1,11 @@
 import { Booking, BookingStats, Sport } from '@/types/booking';
 
-const API_BASE_URL = 'http://localhost:3000/api/bookings';
+const BASE =
+  (import.meta as any).env?.VITE_API_URL?.replace(/\/$/, '') ||
+  'http://localhost:3000';
+const API_BASE_URL = `${BASE}/api/bookings`;
 // Report endpoint is nested under the bookings router: /api/bookings/report
-const REPORT_API_URL = 'http://localhost:3000/api/bookings/report';
+const REPORT_API_URL = `${API_BASE_URL}/report`;
 
 function mapApiToBooking(row: any): Booking {
   // Backend returns Supabase row with PascalCase columns

@@ -74,9 +74,14 @@ export function CalendarView({ onBookingUpdate }: CalendarViewProps) {
     setLoading(true);
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      const prevDateStr = format(subDays(selectedDate, 1), 'yyyy-MM-dd');
       const sportFilter = selectedSport === 'all' ? undefined : selectedSport;
-      const data = await bookingService.getBookings(dateStr, sportFilter);
-      setBookings(data);
+      const [curr, prev] = await Promise.all([
+        bookingService.getBookings(dateStr, sportFilter),
+        bookingService.getBookings(prevDateStr, sportFilter),
+      ]);
+      // Merge bookings from selected day and previous day (for overnight display)
+      setBookings([...(curr || []), ...(prev || [])]);
     } catch (error) {
       console.error('Failed to load bookings:', error);
     } finally {
@@ -105,10 +110,31 @@ export function CalendarView({ onBookingUpdate }: CalendarViewProps) {
   };
 
   const getBookingForTimeSlot = (time: string): Booking | undefined => {
+    const selectedStr = format(selectedDate, 'yyyy-MM-dd');
+    const prevStr = format(subDays(selectedDate, 1), 'yyyy-MM-dd');
     return bookings.find(booking => {
       const bookingStart = booking.start_time.slice(0, 5);
       const bookingEnd = booking.end_time.slice(0, 5);
-      return time >= bookingStart && time < bookingEnd;
+      const isOvernight = bookingEnd < bookingStart;
+
+      if (!isOvernight) {
+        // Show only on its own date
+        if (booking.date !== selectedStr) return false;
+        return time >= bookingStart && time < bookingEnd;
+      }
+
+      // Overnight booking
+      if (booking.date === selectedStr) {
+        // Start-day view: only show from start until midnight (not the after-midnight part)
+        return time >= bookingStart; // e.g., 23:00 shows on the start day
+      }
+
+      if (booking.date === prevStr) {
+        // Next-day view: show early morning portion until bookingEnd
+        return time < bookingEnd; // e.g., 00:00–02:00 on the next day
+      }
+
+      return false;
     });
   };
 
@@ -255,8 +281,8 @@ export function CalendarView({ onBookingUpdate }: CalendarViewProps) {
 
       {/* Time Slots Grid */}
       <Card className="booking-card">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <CardContent className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
             {timeSlots.map((time) => {
               const booking = getBookingForTimeSlot(time);
               const isOccupied = !!booking;
@@ -264,7 +290,7 @@ export function CalendarView({ onBookingUpdate }: CalendarViewProps) {
               return (
                 <div
                   key={time}
-                  className={`booking-slot ${isOccupied ? 'occupied' : ''}`}
+                  className={`booking-slot ${isOccupied ? 'occupied' : ''} min-h-[72px] sm:min-h-[84px]`}
                   onClick={() => handleTimeSlotClick(time)}
                 >
                   <div className="font-medium text-sm mb-2">{formatTo12Hour(time)}</div>
@@ -292,6 +318,7 @@ export function CalendarView({ onBookingUpdate }: CalendarViewProps) {
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {formatTo12Hour(booking.start_time.slice(0, 5))} - {formatTo12Hour(booking.end_time.slice(0, 5))}
+                        {booking.end_time.slice(0, 5) < booking.start_time.slice(0, 5) ? ' (next day)' : ''}
                       </div>
                     </div>
                   ) : (

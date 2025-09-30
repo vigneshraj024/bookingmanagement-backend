@@ -3,6 +3,8 @@ import { Admin, BookingStats } from '@/types/booking';
 import { Header } from '@/components/layout/Header';
 import { Navigation } from '@/components/layout/Navigation';
 import { StatsCards } from '@/components/dashboard/StatsCards';
+import MonthlyRevenueChart from '@/components/dashboard/MonthlyRevenueChart';
+import SportPieChartPanel from '@/components/dashboard/SportPieChartPanel';
 import { SportBreakdown } from '@/components/dashboard/SportBreakdown';
 import { CalendarView } from '@/components/calendar/CalendarView';
 import { bookingService } from '@/lib/bookings';
@@ -12,6 +14,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { PriceMasterPage } from '@/pages/PriceMaster';
+import { AuditLogsPage } from '@/pages/AuditLogs';
+import TodoPanel from '@/components/todo/TodoPanel';
 
 interface DashboardProps {
   admin: Admin;
@@ -152,6 +157,39 @@ export function Dashboard({ admin, onSignOut }: DashboardProps) {
             )}
           </div>
         );
+      case 'price-master':
+        return (
+          <div className="space-y-6">
+            <Card className="stats-card">
+              <CardHeader>
+                <CardTitle>Price Master</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm text-muted-foreground mb-4">Configure hourly prices for each sport.</div>
+                <PriceMasterPage />
+              </CardContent>
+            </Card>
+          </div>
+        );
+      case 'audit-logs':
+        return (
+          <div className="space-y-6">
+            <Card className="stats-card">
+              <CardHeader>
+                <CardTitle>Audit Logs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AuditLogsPage />
+              </CardContent>
+            </Card>
+          </div>
+        );
+      case 'todo':
+        return (
+          <div className="space-y-6">
+            <TodoPanel />
+          </div>
+        );
       default:
         return (
           <div className="space-y-6">
@@ -166,6 +204,12 @@ export function Dashboard({ admin, onSignOut }: DashboardProps) {
             </div>
 
             {stats && <StatsCards stats={stats} />}
+
+            {/* Monthly revenue chart */}
+            <MonthlyRevenueChart sport={reportSport} />
+
+            {/* Pie charts with month selector */}
+            <SportPieChartPanel />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="stats-card">

@@ -1,9 +1,10 @@
+const logoUrl = '/turf-logo.png';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Admin } from '@/types/booking';
+import { User, Settings, LogOut } from 'lucide-react';
 import { authService } from '@/lib/auth';
-import { Trophy, LogOut, User, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface HeaderProps {
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ admin, onSignOut }: HeaderProps) {
   const { toast } = useToast();
+  // Using direct logo import
 
   const handleSignOut = async () => {
     try {
@@ -35,19 +37,31 @@ export function Header({ admin, onSignOut }: HeaderProps) {
     <header className="bg-card border-b border-border/50 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="bg-primary rounded-lg p-2">
-            <Trophy className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-primary">Sports Booking</h1>
-            <p className="text-sm text-muted-foreground">Management Dashboard</p>
+          <div className="flex items-center">
+            <img 
+              src="/turf-logo.png" 
+              alt="TURF 50 Logo" 
+              className="h-12 w-auto"
+              onError={(e) => {
+                console.error('Failed to load logo');
+                // Fallback to text if image fails to load
+                e.currentTarget.outerHTML = `
+                  <div class="flex items-center">
+                    <div class="h-10 w-10 bg-gradient-to-br from-green-600 to-green-800 text-white rounded-md flex items-center justify-center font-bold text-xl mr-3">
+                      T50
+                    </div>
+                    <span class="text-xl font-bold">TURF 50</span>
+                  </div>
+                `;
+              }}
+            />
           </div>
         </div>
 
         <div className="flex items-center space-x-4">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-medium">Welcome back,</p>
-            <p className="text-sm text-muted-foreground">{admin.name}</p>
+<p className="text-sm text-muted-foreground">{admin.name}</p>
           </div>
 
           <DropdownMenu>

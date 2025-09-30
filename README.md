@@ -66,8 +66,4 @@ Simply open [Lovable](https://lovable.dev/projects/f41e413f-6425-4852-b53c-bf289
 
 ## Can I connect a custom domain to my Lovable project?
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+All mutating endpoints automatically write to `AuditLogs` via backend audit utility `backend/src/lib/audit.ts`.
