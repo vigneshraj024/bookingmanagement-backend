@@ -6,6 +6,8 @@ import { logAudit } from '../lib/audit.js';
 // Optionally add: CreatedBy, UpdatedBy in DB; we still capture actor in audit logs.
 
 export const listPrices = async (_req: Request, res: Response) => {
+  console.log("listPrices");
+  
   const { data, error } = await supabase
     .from('PriceMaster')
     .select('Id, Sport, Price, CreatedAt, UpdatedAt')

@@ -31,7 +31,8 @@ export const createBooking = async (req: Request, res: Response) => {
 
 export const getBookings = async (req: Request, res: Response) => {
   const { date, sport } = req.query;
-
+  
+  console.log("getBookings");
   let q = supabase.from('Booking').select('*');
 
   if (date) q = q.eq('Date', String(date));      // no epoch conversion

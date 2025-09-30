@@ -9,4 +9,6 @@ router.post('/', createBooking);
 router.delete('/:id', deleteBooking);
 router.patch('/:id/unlock', unlockBooking);
 
+console.log("Booking routes loaded");
+
 export default router;
